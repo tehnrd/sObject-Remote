@@ -1,0 +1,73 @@
+<apex:page showHeader="true" sidebar="true">
+    <c:sObjectRemote />        
+    
+    <script type="text/javascript">
+
+        var newAccounts = new Array();
+        var queriedAccts = new Array();
+                
+        function insertNewAccount(){
+            var acct = new sObject('Account',{Name: 'sObject-Remote Test Account'});
+            acct.insert(function(result,event){
+                if(event.status){
+                    newAccounts.push(acct);
+                    console.log(newAccounts);
+                }
+            });
+        }
+       
+        function queryAccounts(){
+            sObject.query('select Id, name from account limit 3',{escape:false},function(accts,event){
+                console.log(accts);
+                console.log(event);
+                queriedAccts = accts;                
+            })
+        }
+        
+        function updateAccounts(){
+            sObject.update(queriedAccts,{optAllOrNone: false},function(results,event){
+                console.log(results);
+                console.log(event);
+            });
+        }
+        
+        function deleteNewAccounts(){
+            sObject.del(newAccounts,function(results,event){
+                console.log(results);
+                console.log(event);
+                
+                if(event.status){
+                    //Inspect and process delete result
+                }else{
+                    alert('Delete failed: ' + event.message);
+                }
+            });
+        }
+
+        function queryAndDeleteNewAccounts(){
+            sObject.query('select Id, Name from Account where Name = \'sObject-Remote Test Account\'',function(accts,event){
+                if(event.status){
+                    //Do the delete now after the query is complete
+                    sObject.del(accts,function(results,event){
+                        if(event.status){
+                            console.log('Accounts deleted!');
+                        }else{
+                            console.log('Delete failed.')
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+    
+    <input type="button" value="Insert New Account" onclick="insertNewAccount();"/>
+    
+    <input type="button" value="Query 5 Accounts" onclick="queryAccounts();"/>
+    
+    <input type="button" value="Update 5 Queried Accounts" onclick="updateAccounts();"/>
+    
+    <input type="button" value="Delete New Accounts" onclick="deleteNewAccounts();"/>
+
+    <input type="button" value="Query and Delete All New Test Accounts" onclick="queryAndDeleteNewAccounts();"/>
+    
+</apex:page>
