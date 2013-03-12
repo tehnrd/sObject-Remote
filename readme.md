@@ -200,7 +200,7 @@ In addition to DML Options this object can take special values unique to **sObje
 
 * `escape` - `true` or `false` Sets the escape option on the JavaScript Remoting call to control if response is escaped. Default to `true`.
 * `purge` - `true` or `false` For Deletes only. If the delete for a single sObject is successful it will set the original sObject to null. If Delete was an array of sObjects it will remove successfully deleted sObjects from the original array. Defaults to `false`.
-* `resultAsObject` - `true` or `false` Instead of the result object being returned as an array of SaveResult/DeleteResults objects this will return a JavaScript object with the record Id as the and the value will be the result object. Depending on the use case this may make it easier to identity success and failures. This option only works with **update** and **delete** methods. Defaults to `false`. Example below:
+* `resultAsObject` - `true` or `false` Instead of the result object being returned as an array of SaveResult/DeleteResults objects this will return a JavaScript object with the record Id as the key and the value will be the result object. Depending on the use case this may make it easier to identity success and failures. This option only works with **update** and **delete** methods. Defaults to `false`. Example below:
 
 ```js
 //This is what a normal result array would look like
@@ -244,13 +244,14 @@ sObject.query('select Name, Industry from Account limit 10',function(accts,event
 
 This library creates a global variable called `sObject`. You should not have any other variables in your script with this name. This may be an issue and I am open to community feedback regarding this.
 
-**How is this different from [Force.com JavaScript REST Toolkit](https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit)?**
+#### How is this different from [Force.com JavaScript REST Toolkit](https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit)?
 
 Ya...so it's really not that different. I didn't realize the library already existed before I started working on this but some of the difference are:
 
 * sObject-Remote is focused only on Visualforce JavaScript Remoting
+* Does bulk DML. Insert, update, and delete many records at once. The JavaScript REST Toolkit is, in its purest form, a wrapper for the REST API and the REST API currently only supports single record DML for many operations.
 * Doesn't require a 3rd party library like jQuery, 
 * Supports DML Options (maybe I missed it, but didn't see this in the Toolkit)
 * Has some other nifty utility options
 
-Both are great so play with each and choose which ever one you are most comfortable with or meshes well with your development style.
+**sObject-Remote** is another tool in the toolbox depending on the functionality you require. Both are great so play with each and choose which ever meets your requirements, are most comfortable with, or meshes well with your development style.
