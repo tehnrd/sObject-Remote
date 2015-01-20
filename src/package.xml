@@ -17,5 +17,5 @@
         <members>sObjectRemote</members>
         <name>StaticResource</name>
     </types>
-    <version>27.0</version>
+    <version>32.0</version>
 </Package>
