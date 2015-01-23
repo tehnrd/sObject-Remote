@@ -46,8 +46,8 @@ public with sharing class sObjectRemote{
     @RemoteAction 
     public static List<Database.UpsertResult> upsertSObjects(List<sObject> objects, Map<String,String> dmlOptions){
         Database.UpsertResult[] result = new Database.UpsertResult[]{};
-        Database.DMLOptions dmo = sObjectRemote.setDMLoptions(dmlOptions);
         Map<Schema.SObjectType,List<sObject>> sobjectsMap = new Map<Schema.SObjectType,List<sObject>>();
+        Map<String,Schema.SObjectField> externalIds = new Map<String,Schema.SObjectField>();
         for(sObject sobj : objects){
             Schema.SObjectType stype = sObj.getSobjectType();
             if(sobjectsMap.get(stype) == null){
@@ -56,8 +56,14 @@ public with sharing class sObjectRemote{
             }
             sobjectsMap.get(stype).add(sObj);
         }
-        for(List<sObject> sObjects : sobjectsMap.values()){
-            result.addAll(Database.upsert(sObjects)); 
+        for(Schema.SObjectType stype : sobjectsMap.keyset()){
+            Schema.SObjectField sField = externalIds.get(String.valueOf(stype));
+            if(sField != null){
+                result.addAll(Database.upsert(sobjectsMap.get(stype),sField)); 
+            }
+            else{
+                result.addAll(Database.upsert(sobjectsMap.get(stype))); 
+            }
         }
         
         return result;
@@ -182,5 +188,33 @@ public with sharing class sObjectRemote{
             this.sObjects = new List<sObject>();
             this.sObjectAttributes = new Map<String,String>();
         }
+    }
+
+    private static Map<String,Schema.SObjectField> parseExternalIdFields(List<sObject> objects,Map<String,String> dmlOptions){
+        Map<String,Schema.SObjectField> fieldMap = new Map<String,Schema.SObjectField>();
+        if(!objects.isEmpty()){
+            Map<String,String> externalIds;
+            String externalId = dmlOptions.get('externalId');
+            if(String.isNotBlank(externalId)){
+                if(externalId.contains('=')){
+                    externalIds = sObjectRemote.parseKeyValueString(externalId);
+                    for(String objName : externalIds.keySet()){
+                        fieldMap.put(objName,getSObjectField(objName,externalIds.get(objName)));
+                    }
+                }
+                else{
+                    String objName = objects[0].getSObjectType()+'';
+                    fieldMap.put(objName,getSObjectField(objName,externalIds.get(objName)));
+                }
+            }
+        }
+        return fieldMap;
+    }
+
+    private static Schema.SObjectField getSObjectField(String objName,String fieldName){
+        Type ot = Type.forName(objName);
+        sObject obj = (sObject)ot.newInstance();
+        Schema.DescribeSObjectResult dsr = obj.getSObjectType().getDescribe();
+        return dsr.fields.getMap().get(fieldName);
     }
 }
