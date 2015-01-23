@@ -30,6 +30,13 @@
                 console.log(event);
             });
         }
+
+        function upsertAccounts(){
+            sObject.upsert(queriedAccts,{optAllOrNone: false},function(results,event){
+                console.log(results);
+                console.log(event);
+            });
+        }
         
         function deleteNewAccounts(){
             sObject.del(newAccounts,function(results,event){
@@ -65,6 +72,8 @@
     <input type="button" value="Query 5 Accounts" onclick="queryAccounts();"/>
     
     <input type="button" value="Update 5 Queried Accounts" onclick="updateAccounts();"/>
+
+    <input type="button" value="Upsert 5 Queried Accounts" onclick="upsertAccounts();"/>
     
     <input type="button" value="Delete New Accounts" onclick="deleteNewAccounts();"/>
 
