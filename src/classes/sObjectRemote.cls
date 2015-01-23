@@ -42,6 +42,27 @@ public with sharing class sObjectRemote{
         return result;
     }
 
+    //---Upsert Method---
+    @RemoteAction 
+    public static List<Database.UpsertResult> upsertSObjects(List<sObject> objects, Map<String,String> dmlOptions){
+        Database.UpsertResult[] result = new Database.UpsertResult[]{};
+        Database.DMLOptions dmo = sObjectRemote.setDMLoptions(dmlOptions);
+        Map<Schema.SObjectType,List<sObject>> sobjectsMap = new Map<Schema.SObjectType,List<sObject>>();
+        for(sObject sobj : objects){
+            Schema.SObjectType stype = sObj.getSobjectType();
+            if(sobjectsMap.get(stype) == null){
+                Type listType = Type.forName('List<' + stype + '>');
+                sobjectsMap.put(stype,(List<sObject>)listType.newInstance());
+            }
+            sobjectsMap.get(stype).add(sObj);
+        }
+        for(List<sObject> sObjects : sobjectsMap.values()){
+            result.addAll(Database.upsert(sObjects)); 
+        }
+        
+        return result;
+    }
+
     //---Delete Method---
     @RemoteAction
     public static List<Database.DeleteResult> deleteSObjects(List<sObject> sObjects, Map<String,String> dmlOptions){
