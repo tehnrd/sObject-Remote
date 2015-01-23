@@ -90,6 +90,35 @@ sObject.prototype.update = function(callbackOrOptions,callback){
 	sObject.update(this,callbackOrOptions,callback);
 }
 
+//---Upsert Methods---
+sObject.upsert = function(sObjects,callbackOrOptions,callback){
+
+	var objectsToUpdate = sObject.buildArray(sObjects);
+	var objectStore = new Array();
+	var callback = sObject.setCallback(callbackOrOptions,callback);
+	var options = sObject.setOptions(callbackOrOptions);
+
+	sObject.prepForDML(objectsToUpdate,objectStore,'upsert');
+	
+	//Perform the update operation
+	Visualforce.remoting.Manager.invokeAction(sObjectUpsertMethodName, objectsToUpdate, options, function(result, event){
+
+		//Convert result to object if necessary
+		if(event.status && options.resultAsObject){
+			result = sObject.convertResultToObject(result,objectsToUpdate);
+		}
+
+		sObject.handleDMLResult(result,objectsToUpdate,objectStore,'upsert');
+       	callback(result,event);
+
+   	},{escape: options.escape});
+}
+
+//Upsert one instance of a sObject
+sObject.prototype.upsert = function(callbackOrOptions,callback){
+	sObject.upsert(this,callbackOrOptions,callback);
+}
+
 //---Delete Methods---
 sObject.del = function(sObjects,callbackOrOptions,callback){
 
@@ -200,8 +229,8 @@ sObject.prepForDML = function(sObjects,objectStore,dmlType){
 		//Store the sObject we are currently processing in a var for easy access
 		var sObject = sObjects[i];
 
-		//Set sObjectType for INSERT operations
-		if(dmlType == 'insert'){
+		//Set sObjectType for INSERT / UPSERT operations
+		if(dmlType == 'insert' || dmlType == 'upsert'){
 			sObject.sObjectType = sObjects[i].attributes.sObjectType;
 		}
 
@@ -230,7 +259,7 @@ sObject.handleDMLResult = function(result,sObjects,objectStore,dmlType){
     	delete sObjects[i]['sObjectType'];
     	
     	//If record was inserted successfully, update the id
-    	if(dmlType == 'insert' && result[i].success){
+    	if((dmlType == 'insert' || dmlType == 'upsert') && result[i].success){
     		sObjects[i].Id = result[i].id;
     	}
 

@@ -10,5 +10,6 @@
         var sObjectInsertMethodName = '{!$RemoteAction.sObjectRemote.insertSObjects}';
         var sObjectUpdateMethodName = '{!$RemoteAction.sObjectRemote.updateSObjects}';
         var sObjectDeleteMethodName = '{!$RemoteAction.sObjectRemote.deleteSObjects}';
+        var sObjectUpsertMethodName = '{!$RemoteAction.sObjectRemote.upsertSObjects}';
     </script>
 </apex:component>
