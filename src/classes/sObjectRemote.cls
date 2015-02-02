@@ -47,7 +47,7 @@ public with sharing class sObjectRemote{
     public static List<Database.UpsertResult> upsertSObjects(List<sObject> objects, Map<String,String> dmlOptions){
         Database.UpsertResult[] result = new Database.UpsertResult[]{};
         Map<Schema.SObjectType,List<sObject>> sobjectsMap = new Map<Schema.SObjectType,List<sObject>>();
-        Map<String,Schema.SObjectField> externalIds = new Map<String,Schema.SObjectField>();
+        Map<String,Schema.SObjectField> externalIds = parseExternalIdFields(objects,dmlOptions);
         for(sObject sobj : objects){
             Schema.SObjectType stype = sObj.getSobjectType();
             if(sobjectsMap.get(stype) == null){
