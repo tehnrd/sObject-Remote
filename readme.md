@@ -120,6 +120,26 @@ sObject.update(acctsToUpdate,function(results,event){
 });
 ```
 
+### Upsert - sObject.del(sObject || sObjectArray,[dmlOptions],callback);
+
+Upsert follows similar structures as insert and updates but in addition you have the option to send externalIds.
+
+```js
+//init a account
+var acct = new sObject('Account');
+acct.Name = 'TehNrd Industries';
+acct.BillingCity = 'Seattle';
+acct.My_External_Id__c = '12345';
+
+sObject.upsert(acct,function(results,event){
+	if(event.status){
+		//All good, update success
+	}else{
+		//Error handling.
+	}
+});
+```
+
 ### Delete - sObject.del(sObject || sObjectArray,[dmlOptions],callback);
 
 Delete follows the same structure as inserts and updates. Even though you pass an entire sObject or array of sObjects to the `sObject.delete()` method the sObject-Remote library will only send the Id values to the server as this is all that is needed for a delete operation and therefore also improves performance. In this example we also set some DML options to allow partial success of the records being deleted.
@@ -210,6 +230,8 @@ In addition to DML Options this object can take special values unique to **sObje
 {001i0000003WM2lAAG:{success:true},
 001i0000003WM2mAAG:{success:true}} 
 ```
+
+* `externalId` - Lets you define external Id field API name, you can also define this for multiple objects by doing something like `Account=MyAccountExternalId__c,Contact=MyContactExternalId__c`
 
 ### Tips, Tricks, and FAQ
 
