@@ -1,6 +1,11 @@
 sObject-Remote
 ======
 
+<a href="https://githubsfdeploy.herokuapp.com?owner=TehNrd&repo=sObject-Remote">
+  <img alt="Deploy to Salesforce"
+       src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/src/main/webapp/resources/img/deploy.png">
+</a>
+
 **sObject-Remote** is a small JavaScript library for simplifying DML operations on sObjects when using the JavaScript Remoting feature of Visualforce. Here is a tasty little preview that creates and inserts a new Account record:
 
 ```js
